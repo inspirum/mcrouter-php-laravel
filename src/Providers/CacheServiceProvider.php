@@ -38,7 +38,7 @@ class CacheServiceProvider extends LaravelCacheServiceProvider
         $this->getCacheManager($this->app)->extend('memcached', function (Application $app, array $config) {
             // get cache prefix
             $cacheManager = $this->getCacheManager($app);
-            $prefix       = $cacheManager->getPrefix($config);
+            $prefix       = $config['prefix'] ?? $app['config']['cache.prefix'];
 
             // connect memcached
             $connector = $this->getMemcachedConnector($app);

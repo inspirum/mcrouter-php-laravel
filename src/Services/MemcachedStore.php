@@ -11,23 +11,6 @@ use Memcached;
 class MemcachedStore extends LaravelMemcachedStore
 {
     /**
-     * Create a new Memcached store.
-     *
-     * @noinspection PhpMissingParentConstructorInspection
-     *
-     * @param \Memcached $memcached
-     * @param string     $prefix
-     *
-     * @return void
-     */
-    public function __construct($memcached, $prefix = '')
-    {
-        $this->setPrefix($prefix);
-        $this->memcached      = $memcached;
-        $this->onVersionThree = true;
-    }
-
-    /**
      * Begin executing a new tags operation.
      *
      * @param array|mixed $names
@@ -72,21 +55,25 @@ class MemcachedStore extends LaravelMemcachedStore
             return $this->getPrefixedKey($key);
         }, $keys);
 
+        /** @var array $values */
         $values = $this->memcached->getMulti($prefixedKeys, Memcached::GET_PRESERVE_ORDER);
 
         if ($this->memcached->getResultCode() !== 0) {
             return array_fill_keys($keys, null);
         }
 
-        return array_combine($keys, $values);
+        /** @var array $values */
+        $values = array_combine($keys, $values);
+
+        return $values;
     }
 
     /**
      * Store an item in the cache for a given number of minutes.
      *
-     * @param string    $key
-     * @param mixed     $value
-     * @param float|int $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
      *
      * @return bool
      */
@@ -98,8 +85,8 @@ class MemcachedStore extends LaravelMemcachedStore
     /**
      * Store multiple items in the cache for a given number of minutes.
      *
-     * @param array     $values
-     * @param float|int $seconds
+     * @param array $values
+     * @param int   $seconds
      *
      * @return bool
      */
@@ -117,9 +104,9 @@ class MemcachedStore extends LaravelMemcachedStore
     /**
      * Store an item in the cache if the key doesn't exist.
      *
-     * @param string    $key
-     * @param mixed     $value
-     * @param float|int $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
      *
      * @return bool
      */
