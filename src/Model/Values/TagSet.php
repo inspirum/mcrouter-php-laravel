@@ -61,6 +61,26 @@ class TagSet extends LaravelTagSet
      */
     public function tagKey($name)
     {
-        return Mcrouter::getSharedKey('tag:' . $name . ':key');
+        return Mcrouter::getSharedKey(parent::tagKey($name));
+    }
+
+    /**
+     * Reset cached tags from static memory
+     *
+     * @return void
+     */
+    public static function resetCachedTags(): void
+    {
+        static::$tags = [];
+    }
+
+    /**
+     * Get cached tags from static memory
+     *
+     * @return array
+     */
+    public static function getCachedTags(): array
+    {
+        return static::$tags;
     }
 }

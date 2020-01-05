@@ -22,6 +22,7 @@
             <exclude>
                 <directory suffix="Interface.php">src/</directory>
                 <directory suffix=".php">src/Definitions</directory>
+                <directory suffix=".php">src/Providers</directory>
             </exclude>
         </whitelist>
     </filter>

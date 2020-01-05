@@ -1,7 +1,8 @@
 <?php
 
-namespace Inspirum\Project\Tests;
+namespace Inspirum\Cache\Tests;
 
+use Inspirum\Cache\Model\Values\TagSet;
 use Mockery;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
@@ -15,6 +16,8 @@ abstract class AbstractTestCase extends PHPUnitTestCase
     protected function setUp()
     {
         parent::setUp();
+
+        TagSet::resetCachedTags();
     }
 
     /**

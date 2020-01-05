@@ -50,11 +50,11 @@ class MemcachedStore extends LaravelMemcachedStore
     {
         $value = $this->memcached->get($this->getPrefixedKey($key));
 
-        if ($this->memcached->getResultCode() === 0) {
-            return $value;
+        if ($this->memcached->getResultCode() !== 0) {
+            return null;
         }
 
-        return null;
+        return $value;
     }
 
     /**

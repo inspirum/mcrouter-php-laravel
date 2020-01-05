@@ -4,7 +4,7 @@ namespace Inspirum\Cache\Tests\Unit;
 
 use Illuminate\Support\Carbon;
 use Inspirum\Cache\Services\MemcachedStore;
-use Inspirum\Project\Tests\AbstractTestCase;
+use Inspirum\Cache\Tests\AbstractTestCase;
 use Memcached;
 use stdClass;
 
@@ -60,6 +60,24 @@ class CacheMemcachedStoreTest extends AbstractTestCase
         );
     }
 
+    public function testMemcacheGetMultiValuesAreReturnedWithMissingKeys()
+    {
+        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['getMulti', 'getResultCode'])->getMock();
+        $memcache->expects($this->once())
+                 ->method('getMulti')
+                 ->with(['foo:foo', 'foo:bar', 'foo:baz']);
+        $memcache->expects($this->once())
+                 ->method('getResultCode')
+                 ->will($this->returnValue(1));
+
+        $store = new MemcachedStore($memcache, 'foo');
+
+        $this->assertEquals(
+            ['foo' => null, 'bar' => null, 'baz' => null],
+            $store->many(['foo', 'bar', 'baz',])
+        );
+    }
+
     public function testSetMethodProperlyCallsMemcache()
     {
         Carbon::setTestNow($now = Carbon::now());
@@ -73,6 +91,44 @@ class CacheMemcachedStoreTest extends AbstractTestCase
         $store = new MemcachedStore($memcache);
 
         $result = $store->put('foo', 'bar', 60);
+
+        $this->assertTrue($result);
+
+        Carbon::setTestNow();
+    }
+
+    public function testPutManyMethodProperlyCallsMemcache()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['setMulti'])->getMock();
+        $memcache->expects($this->once())
+                 ->method('setMulti')
+                 ->with(['foo' => 'fizz', 'bar' => 'buzz', 'baz' => 'norf'])
+                 ->willReturn(true);
+
+        $store = new MemcachedStore($memcache);
+
+        $result = $store->putMany(['foo' => 'fizz', 'bar' => 'buzz', 'baz' => 'norf'], 60);
+
+        $this->assertTrue($result);
+
+        Carbon::setTestNow();
+    }
+
+    public function testAddMethodProperlyCallsMemcache()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['add'])->getMock();
+        $memcache->expects($this->once())
+                 ->method('add')
+                 ->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($now->timestamp + 60))
+                 ->willReturn(true);
+
+        $store = new MemcachedStore($memcache);
+
+        $result = $store->add('foo', 'bar', 60);
 
         $this->assertTrue($result);
 
@@ -157,5 +213,31 @@ class CacheMemcachedStoreTest extends AbstractTestCase
         $store->setPrefix(null);
 
         $this->assertEmpty($store->getPrefix());
+    }
+
+    public function testWrongSharedPrefixIsPrefixed()
+    {
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get'])->getMock();
+        $memcache->expects($this->once())
+                 ->method('get')
+                 ->with($this->equalTo('foo:/wrong/shr/bar'))
+                 ->willReturn(null);
+
+        $store = new MemcachedStore($memcache, 'foo');
+
+        $this->assertNull($store->get('/wrong/shr/bar'));
+    }
+
+    public function testSharedPrefixIsNotPrefixed()
+    {
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get'])->getMock();
+        $memcache->expects($this->once())
+                 ->method('get')
+                 ->with($this->equalTo('/default/shr/foo:bar'))
+                 ->willReturn(null);
+
+        $store = new MemcachedStore($memcache, 'foo');
+
+        $this->assertNull($store->get('/default/shr/bar'));
     }
 }
