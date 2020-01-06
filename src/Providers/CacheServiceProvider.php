@@ -6,6 +6,7 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\CacheServiceProvider as LaravelCacheServiceProvider;
 use Illuminate\Cache\MemcachedConnector;
 use Illuminate\Contracts\Foundation\Application;
+use Inspirum\Cache\Model\Values\Mcrouter;
 use Inspirum\Cache\Services\MemcachedStore;
 
 class CacheServiceProvider extends LaravelCacheServiceProvider
@@ -49,8 +50,13 @@ class CacheServiceProvider extends LaravelCacheServiceProvider
                 array_filter($config['sasl'] ?? [])
             );
 
+            $mcrouter = new Mcrouter(
+                $config['mcrouter']['shared_prefix'] ?? Mcrouter::SHARED_PREFIX,
+                $config['mcrouter']['prefixes'] ?? []
+            );
+
             // register memcached store
-            return $cacheManager->repository(new MemcachedStore($memcached, $prefix));
+            return $cacheManager->repository(new MemcachedStore($memcached, $prefix, $mcrouter));
         });
     }
 

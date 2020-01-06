@@ -3,15 +3,17 @@
 namespace Inspirum\Cache\Tests\Unit;
 
 use Illuminate\Cache\ArrayStore;
+use Inspirum\Cache\Model\Values\Mcrouter;
 use Inspirum\Cache\Model\Values\TagSet;
 use Inspirum\Cache\Services\MemcachedStore;
 use Inspirum\Cache\Tests\AbstractTestCase;
+use Memcached;
 
 class CacheTaggedCacheTest extends AbstractTestCase
 {
     public function testTagKeyHasSharedPrefix()
     {
-        $tagSet = new TagSet(new ArrayStore('foo'), []);
+        $tagSet = new TagSet(new ArrayStore('foo'), [], new Mcrouter('/default/shr/'));
 
         $this->assertEquals('/default/shr/tag:bar:key', $tagSet->tagKey('bar'));
         $this->assertEquals('/default/shr/tag:foo:key', $tagSet->tagKey('foo'));
@@ -19,7 +21,7 @@ class CacheTaggedCacheTest extends AbstractTestCase
 
     public function testTagsHasStaticCache()
     {
-        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['get', 'set', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get', 'set', 'getResultCode'])->getMock();
         $memcache->expects($this->exactly(2))
                  ->method('get')
                  ->will($this->returnValue(null));
@@ -41,7 +43,7 @@ class CacheTaggedCacheTest extends AbstractTestCase
 
     public function testStaticCacheCanBeReset()
     {
-        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['get', 'set', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get', 'set', 'getResultCode'])->getMock();
         $memcache->expects($this->exactly(3))
                  ->method('get')
                  ->will($this->returnValue(null));
@@ -66,7 +68,7 @@ class CacheTaggedCacheTest extends AbstractTestCase
 
     public function testStaticCacheCanBeFlushed()
     {
-        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['get', 'set', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get', 'set', 'getResultCode'])->getMock();
         $memcache->expects($this->exactly(4))
                  ->method('get')
                  ->will($this->returnValue(null));

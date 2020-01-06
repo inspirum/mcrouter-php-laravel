@@ -3,7 +3,7 @@
 namespace Inspirum\Cache\Model\Values;
 
 use Illuminate\Cache\TagSet as LaravelTagSet;
-use Inspirum\Cache\Definitions\Mcrouter;
+use Illuminate\Contracts\Cache\Store;
 
 class TagSet extends LaravelTagSet
 {
@@ -13,6 +13,27 @@ class TagSet extends LaravelTagSet
      * @var array
      */
     private static $tags = [];
+
+    /**
+     * Mcrouter config
+     *
+     * @var \Inspirum\Cache\Model\Values\Mcrouter
+     */
+    private $mcrouter;
+
+    /**
+     * Create a new TagSet instance.
+     *
+     * @param \Illuminate\Contracts\Cache\Store     $store
+     * @param array                                 $names
+     * @param \Inspirum\Cache\Model\Values\Mcrouter $mcrouter
+     */
+    public function __construct(Store $store, array $names, Mcrouter $mcrouter)
+    {
+        parent::__construct($store, $names);
+
+        $this->mcrouter = $mcrouter;
+    }
 
     /**
      * Get an array of tag identifiers for all of the tags in the set.
@@ -61,7 +82,7 @@ class TagSet extends LaravelTagSet
      */
     public function tagKey($name)
     {
-        return Mcrouter::getSharedKey(parent::tagKey($name));
+        return $this->mcrouter->getSharedKey(parent::tagKey($name));
     }
 
     /**

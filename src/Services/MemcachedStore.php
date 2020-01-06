@@ -4,12 +4,33 @@ namespace Inspirum\Cache\Services;
 
 use Illuminate\Cache\MemcachedStore as LaravelMemcachedStore;
 use Illuminate\Cache\TaggedCache;
-use Inspirum\Cache\Definitions\Mcrouter;
+use Inspirum\Cache\Model\Values\Mcrouter;
 use Inspirum\Cache\Model\Values\TagSet;
 use Memcached;
 
 class MemcachedStore extends LaravelMemcachedStore
 {
+    /**
+     * Mcrouter config
+     *
+     * @var \Inspirum\Cache\Model\Values\Mcrouter
+     */
+    private $mcrouter;
+
+    /**
+     * Create a new Memcached store.
+     *
+     * @param \Memcached                            $memcached
+     * @param string                                $prefix
+     * @param \Inspirum\Cache\Model\Values\Mcrouter $mcrouter
+     */
+    public function __construct(Memcached $memcached, string $prefix = '', Mcrouter $mcrouter = null)
+    {
+        parent::__construct($memcached, $prefix);
+
+        $this->mcrouter = $mcrouter ?: new Mcrouter('');
+    }
+
     /**
      * Begin executing a new tags operation.
      *
@@ -19,7 +40,7 @@ class MemcachedStore extends LaravelMemcachedStore
      */
     public function tags($names)
     {
-        return new TaggedCache($this, new TagSet($this, is_array($names) ? $names : func_get_args()));
+        return new TaggedCache($this, new TagSet($this, is_array($names) ? $names : func_get_args(), $this->mcrouter));
     }
 
     /**
@@ -162,7 +183,7 @@ class MemcachedStore extends LaravelMemcachedStore
      */
     protected function getPrefixedKey(string $key): string
     {
-        $prefixes = Mcrouter::getPrefixes();
+        $prefixes = $this->mcrouter->getPrefixes();
 
         foreach ($prefixes as $prefix) {
             $position = strpos($key, $prefix);

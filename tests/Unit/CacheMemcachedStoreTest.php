@@ -3,16 +3,16 @@
 namespace Inspirum\Cache\Tests\Unit;
 
 use Illuminate\Support\Carbon;
+use Inspirum\Cache\Model\Values\Mcrouter;
 use Inspirum\Cache\Services\MemcachedStore;
 use Inspirum\Cache\Tests\AbstractTestCase;
 use Memcached;
-use stdClass;
 
 class CacheMemcachedStoreTest extends AbstractTestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {
-        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['get', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())
                  ->method('get')
                  ->with($this->equalTo('foo:bar'))
@@ -28,7 +28,7 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testMemcacheValueIsReturned()
     {
-        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['get', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())
                  ->method('get')
                  ->will($this->returnValue('bar'));
@@ -43,7 +43,7 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testMemcacheGetMultiValuesAreReturnedWithCorrectKeys()
     {
-        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['getMulti', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['getMulti', 'getResultCode'])->getMock();
         $memcache->expects($this->once())
                  ->method('getMulti')
                  ->with(['foo:foo', 'foo:bar', 'foo:baz'])
@@ -62,7 +62,7 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testMemcacheGetMultiValuesAreReturnedWithMissingKeys()
     {
-        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['getMulti', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['getMulti', 'getResultCode'])->getMock();
         $memcache->expects($this->once())
                  ->method('getMulti')
                  ->with(['foo:foo', 'foo:bar', 'foo:baz']);
@@ -215,17 +215,30 @@ class CacheMemcachedStoreTest extends AbstractTestCase
         $this->assertEmpty($store->getPrefix());
     }
 
+    public function testNoMcrouterConfigNeeded()
+    {
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get'])->getMock();
+        $memcache->expects($this->once())
+                 ->method('get')
+                 ->with($this->equalTo('foo:/default/shr/bar'))
+                 ->willReturn(null);
+
+        $store = new MemcachedStore($memcache, 'foo');
+
+        $this->assertNull($store->get('/default/shr/bar'));
+    }
+
     public function testWrongSharedPrefixIsPrefixed()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get'])->getMock();
         $memcache->expects($this->once())
                  ->method('get')
-                 ->with($this->equalTo('foo:/wrong/shr/bar'))
+                 ->with($this->equalTo('foo:/default/shr/bar'))
                  ->willReturn(null);
 
-        $store = new MemcachedStore($memcache, 'foo');
+        $store = new MemcachedStore($memcache, 'foo', new Mcrouter('/default/local/'));
 
-        $this->assertNull($store->get('/wrong/shr/bar'));
+        $this->assertNull($store->get('/default/shr/bar'));
     }
 
     public function testSharedPrefixIsNotPrefixed()
@@ -236,8 +249,29 @@ class CacheMemcachedStoreTest extends AbstractTestCase
                  ->with($this->equalTo('/default/shr/foo:bar'))
                  ->willReturn(null);
 
-        $store = new MemcachedStore($memcache, 'foo');
+        $store = new MemcachedStore($memcache, 'foo', new Mcrouter('/default/shr/'));
 
         $this->assertNull($store->get('/default/shr/bar'));
+    }
+
+    public function testAdditionalPrefixesIsNotPrefixed()
+    {
+        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get'])->getMock();
+        $memcache->expects($this->exactly(4))
+                 ->method('get')
+                 ->withConsecutive(
+                     [$this->equalTo('/default/shr/foo:bar')],
+                     [$this->equalTo('/default/a/foo:bar')],
+                     [$this->equalTo('/default/b/foo:bar')],
+                     [$this->equalTo('foo:/default/c/bar')]
+                 )
+                 ->willReturn(null);
+
+        $store = new MemcachedStore($memcache, 'foo', new Mcrouter('/default/shr/', ['/default/a/', '/default/b/']));
+
+        $this->assertNull($store->get('/default/shr/bar'));
+        $this->assertNull($store->get('/default/a/bar'));
+        $this->assertNull($store->get('/default/b/bar'));
+        $this->assertNull($store->get('/default/c/bar'));
     }
 }

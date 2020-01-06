@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use Inspirum\Cache\Model\Values\Mcrouter;
 
 return [
     /*
@@ -16,7 +17,9 @@ return [
     |            "memcached", "redis", "dynamodb"
     |
     */
+
     'default' => env('CACHE_DRIVER', 'file'),
+
     /*
     |--------------------------------------------------------------------------
     | Cache Stores
@@ -27,7 +30,8 @@ return [
     | same cache driver to group types of items stored in your caches.
     |
     */
-    'stores'  => [
+
+    'stores' => [
         'apc'       => [
             'driver' => 'apc',
         ],
@@ -74,6 +78,7 @@ return [
             'endpoint' => env('DYNAMODB_ENDPOINT'),
         ],
     ],
+
     /*
     |--------------------------------------------------------------------------
     | Cache Key Prefix
@@ -84,5 +89,18 @@ return [
     | value to get prefixed to all our keys so we can avoid collisions.
     |
     */
-    'prefix'  => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_cache'),
+
+    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_cache'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mcrouter prefixes
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'mcrouter' => [
+        'shared_prefix' => env('CACHE_MCROUTER_SHARED_PREFIX', Mcrouter::SHARED_PREFIX),
+        'prefixes'      => explode(',', env('CACHE_MCROUTER_PREFIXES', '')),
+    ],
 ];
