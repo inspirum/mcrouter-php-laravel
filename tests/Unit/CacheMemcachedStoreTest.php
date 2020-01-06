@@ -1,11 +1,11 @@
 <?php
 
-namespace Inspirum\Cache\Tests\Unit;
+namespace Inspirum\Mcrouter\Tests\Unit;
 
 use Illuminate\Support\Carbon;
-use Inspirum\Cache\Model\Values\Mcrouter;
-use Inspirum\Cache\Services\MemcachedStore;
-use Inspirum\Cache\Tests\AbstractTestCase;
+use Inspirum\Mcrouter\Model\Values\Mcrouter;
+use Inspirum\Mcrouter\Services\MemcachedStore;
+use Inspirum\Mcrouter\Tests\AbstractTestCase;
 use Memcached;
 
 class CacheMemcachedStoreTest extends AbstractTestCase

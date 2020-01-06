@@ -1,11 +1,11 @@
 <?php
 
-namespace Inspirum\Cache\Services;
+namespace Inspirum\Mcrouter\Services;
 
 use Illuminate\Cache\MemcachedStore as LaravelMemcachedStore;
 use Illuminate\Cache\TaggedCache;
-use Inspirum\Cache\Model\Values\Mcrouter;
-use Inspirum\Cache\Model\Values\TagSet;
+use Inspirum\Mcrouter\Model\Values\Mcrouter;
+use Inspirum\Mcrouter\Model\Values\TagSet;
 use Memcached;
 
 class MemcachedStore extends LaravelMemcachedStore
@@ -13,7 +13,7 @@ class MemcachedStore extends LaravelMemcachedStore
     /**
      * Mcrouter config
      *
-     * @var \Inspirum\Cache\Model\Values\Mcrouter
+     * @var \Inspirum\Mcrouter\Model\Values\Mcrouter
      */
     private $mcrouter;
 
@@ -22,7 +22,7 @@ class MemcachedStore extends LaravelMemcachedStore
      *
      * @param \Memcached                            $memcached
      * @param string                                $prefix
-     * @param \Inspirum\Cache\Model\Values\Mcrouter $mcrouter
+     * @param \Inspirum\Mcrouter\Model\Values\Mcrouter $mcrouter
      */
     public function __construct(Memcached $memcached, string $prefix = '', Mcrouter $mcrouter = null)
     {

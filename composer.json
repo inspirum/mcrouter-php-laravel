@@ -1,5 +1,5 @@
 {
-  "name": "inspirum/cache",
+  "name": "inspirum/mcouter",
   "description": "",
   "keywords": [
     "inspirum",
@@ -9,7 +9,7 @@
     "mcrouter",
     "cache"
   ],
-  "homepage": "https://github.com/inspirum/cache-php-laravel",
+  "homepage": "https://github.com/inspirum/mcouter-php-laravel",
   "license": "MIT",
   "type": "library",
   "authors": [
@@ -34,12 +34,19 @@
   },
   "autoload": {
     "psr-4": {
-      "Inspirum\\Cache\\": "src"
+      "Inspirum\\Mcrouter\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Inspirum\\Cache\\Tests\\": "tests"
+      "Inspirum\\Mcrouter\\Tests\\": "tests"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Inspirum\\Mcrouter\\Providers\\McrouterServiceProvider"
+      ]
     }
   },
   "scripts": {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Inspirum\Cache\Model\Values;
+namespace Inspirum\Mcrouter\Model\Values;
 
 use Illuminate\Cache\TagSet as LaravelTagSet;
 use Illuminate\Contracts\Cache\Store;
@@ -17,7 +17,7 @@ class TagSet extends LaravelTagSet
     /**
      * Mcrouter config
      *
-     * @var \Inspirum\Cache\Model\Values\Mcrouter
+     * @var \Inspirum\Mcrouter\Model\Values\Mcrouter
      */
     private $mcrouter;
 
@@ -26,7 +26,7 @@ class TagSet extends LaravelTagSet
      *
      * @param \Illuminate\Contracts\Cache\Store     $store
      * @param array                                 $names
-     * @param \Inspirum\Cache\Model\Values\Mcrouter $mcrouter
+     * @param \Inspirum\Mcrouter\Model\Values\Mcrouter $mcrouter
      */
     public function __construct(Store $store, array $names, Mcrouter $mcrouter)
     {

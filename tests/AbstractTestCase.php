@@ -1,8 +1,8 @@
 <?php
 
-namespace Inspirum\Cache\Tests;
+namespace Inspirum\Mcrouter\Tests;
 
-use Inspirum\Cache\Model\Values\TagSet;
+use Inspirum\Mcrouter\Model\Values\TagSet;
 use Mockery;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 

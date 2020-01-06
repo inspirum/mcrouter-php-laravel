@@ -1,12 +1,12 @@
 <?php
 
-namespace Inspirum\Cache\Tests\Unit;
+namespace Inspirum\Mcrouter\Tests\Unit;
 
 use Illuminate\Cache\ArrayStore;
-use Inspirum\Cache\Model\Values\Mcrouter;
-use Inspirum\Cache\Model\Values\TagSet;
-use Inspirum\Cache\Services\MemcachedStore;
-use Inspirum\Cache\Tests\AbstractTestCase;
+use Inspirum\Mcrouter\Model\Values\Mcrouter;
+use Inspirum\Mcrouter\Model\Values\TagSet;
+use Inspirum\Mcrouter\Services\MemcachedStore;
+use Inspirum\Mcrouter\Tests\AbstractTestCase;
 use Memcached;
 
 class CacheTaggedCacheTest extends AbstractTestCase

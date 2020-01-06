@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
-use Inspirum\Cache\Model\Values\Mcrouter;
+use Inspirum\Mcrouter\Model\Values\Mcrouter;
 
 return [
     /*

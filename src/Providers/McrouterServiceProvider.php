@@ -1,15 +1,16 @@
 <?php
 
-namespace Inspirum\Cache\Providers;
+namespace Inspirum\Mcrouter\Providers;
 
 use Illuminate\Cache\CacheManager;
-use Illuminate\Cache\CacheServiceProvider as LaravelCacheServiceProvider;
 use Illuminate\Cache\MemcachedConnector;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
-use Inspirum\Cache\Model\Values\Mcrouter;
-use Inspirum\Cache\Services\MemcachedStore;
+use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Inspirum\Mcrouter\Model\Values\Mcrouter;
+use Inspirum\Mcrouter\Services\MemcachedStore;
 
-class CacheServiceProvider extends LaravelCacheServiceProvider
+class McrouterServiceProvider extends LaravelServiceProvider
 {
     /**
      * Register the service provider.
@@ -19,10 +20,7 @@ class CacheServiceProvider extends LaravelCacheServiceProvider
     public function register()
     {
         // register cache config
-        $this->mergeConfigFrom(__DIR__ . '/../../config/cache.php', 'cache');
-
-        // register cache repository
-        parent::register();
+        $this->mergeConfigFrom(__DIR__ . '/../../config/mcrouter.php', 'mcrouter');
 
         // register custom memcached driver
         $this->registerCustomMemcachedDriver();
@@ -38,8 +36,10 @@ class CacheServiceProvider extends LaravelCacheServiceProvider
         // extend to custom memcached store
         $this->getCacheManager($this->app)->extend('memcached', function (Application $app, array $config) {
             // get cache prefix
-            $cacheManager = $this->getCacheManager($app);
-            $prefix       = $config['prefix'] ?? $app['config']['cache.prefix'];
+            $cacheManager     = $this->getCacheManager($app);
+            $configRepository = $this->getConfig($app);
+
+            $prefix = $config['prefix'] ?? $configRepository->get('cache.prefix');
 
             // connect memcached
             $connector = $this->getMemcachedConnector($app);
@@ -51,13 +51,25 @@ class CacheServiceProvider extends LaravelCacheServiceProvider
             );
 
             $mcrouter = new Mcrouter(
-                $config['mcrouter']['shared_prefix'] ?? Mcrouter::SHARED_PREFIX,
-                $config['mcrouter']['prefixes'] ?? []
+                $configRepository->get('mcrouter.shared_prefix') ?? Mcrouter::SHARED_PREFIX,
+                $configRepository->get('mcrouter.prefixes') ?? []
             );
 
             // register memcached store
             return $cacheManager->repository(new MemcachedStore($memcached, $prefix, $mcrouter));
         });
+    }
+
+    /**
+     * Get config repository
+     *
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     *
+     * @return \Illuminate\Contracts\Config\Repository
+     */
+    private function getConfig(Application &$app): ConfigRepository
+    {
+        return $app->get('config');
     }
 
     /**

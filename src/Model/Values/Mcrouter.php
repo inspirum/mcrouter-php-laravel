@@ -1,6 +1,6 @@
 <?php
 
-namespace Inspirum\Cache\Model\Values;
+namespace Inspirum\Mcrouter\Model\Values;
 
 class Mcrouter
 {
