@@ -20,9 +20,9 @@ class MemcachedStore extends LaravelMemcachedStore
     /**
      * Create a new Memcached store.
      *
-     * @param \Memcached                            $memcached
-     * @param string                                $prefix
-     * @param \Inspirum\Mcrouter\Model\Values\Mcrouter $mcrouter
+     * @param \Memcached                                    $memcached
+     * @param string                                        $prefix
+     * @param \Inspirum\Mcrouter\Model\Values\Mcrouter|null $mcrouter
      */
     public function __construct(Memcached $memcached, string $prefix = '', Mcrouter $mcrouter = null)
     {
@@ -34,7 +34,7 @@ class MemcachedStore extends LaravelMemcachedStore
     /**
      * Begin executing a new tags operation.
      *
-     * @param array|mixed $names
+     * @param string|string[] $names
      *
      * @return \Illuminate\Cache\TaggedCache
      */
@@ -66,7 +66,7 @@ class MemcachedStore extends LaravelMemcachedStore
      *
      * Items not found in the cache will have a null value.
      *
-     * @param array $keys
+     * @param string[] $keys
      *
      * @return array
      */

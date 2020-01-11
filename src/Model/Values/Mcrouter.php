@@ -21,15 +21,15 @@ class Mcrouter
     /**
      * Supported prefixes in Mcrouter
      *
-     * @var array
+     * @var string[]
      */
     private $prefixes = [];
 
     /**
      * Mcrouter constructor
      *
-     * @param string $sharedPrefix
-     * @param array  $supportedPrefixes
+     * @param string   $sharedPrefix
+     * @param string[] $supportedPrefixes
      */
     public function __construct(string $sharedPrefix, array $supportedPrefixes = [])
     {
@@ -40,7 +40,7 @@ class Mcrouter
     /**
      * Get the cache prefixes.
      *
-     * @return array
+     * @return string[]
      */
     public function getPrefixes(): array
     {
@@ -48,7 +48,7 @@ class Mcrouter
     }
 
     /**
-     * Get the shared-cache Mcrouter prefix.
+     * Get the cache key with Mcrouter shared prefix.
      *
      * @param string $key
      *

@@ -9,7 +9,7 @@ use Inspirum\Mcrouter\Services\MemcachedStore;
 use Inspirum\Mcrouter\Tests\AbstractTestCase;
 use Memcached;
 
-class CacheTaggedCacheTest extends AbstractTestCase
+class TaggedCacheTest extends AbstractTestCase
 {
     public function testTagKeyHasSharedPrefix()
     {
@@ -21,7 +21,10 @@ class CacheTaggedCacheTest extends AbstractTestCase
 
     public function testTagsHasStaticCache()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get', 'set', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['get', 'set', 'getResultCode'])
+                         ->getMock();
+
         $memcache->expects($this->exactly(2))
                  ->method('get')
                  ->will($this->returnValue(null));
@@ -31,7 +34,7 @@ class CacheTaggedCacheTest extends AbstractTestCase
 
         $store = new MemcachedStore($memcache, 'foo');
 
-        $tags  = ['bop', 'zap'];
+        $tags = ['bop', 'zap'];
 
         $namespace = $store->tags($tags)->getTags()->getNamespace();
         $this->assertEquals($namespace, $store->tags($tags)->getTags()->getNamespace());
@@ -43,7 +46,10 @@ class CacheTaggedCacheTest extends AbstractTestCase
 
     public function testStaticCacheCanBeReset()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get', 'set', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['get', 'set', 'getResultCode'])
+                         ->getMock();
+
         $memcache->expects($this->exactly(3))
                  ->method('get')
                  ->will($this->returnValue(null));
@@ -68,7 +74,10 @@ class CacheTaggedCacheTest extends AbstractTestCase
 
     public function testStaticCacheCanBeFlushed()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get', 'set', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['get', 'set', 'getResultCode'])
+                         ->getMock();
+
         $memcache->expects($this->exactly(4))
                  ->method('get')
                  ->will($this->returnValue(null));

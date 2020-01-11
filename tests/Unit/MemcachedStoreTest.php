@@ -8,11 +8,14 @@ use Inspirum\Mcrouter\Services\MemcachedStore;
 use Inspirum\Mcrouter\Tests\AbstractTestCase;
 use Memcached;
 
-class CacheMemcachedStoreTest extends AbstractTestCase
+class MemcachedStoreTest extends AbstractTestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['get', 'getResultCode'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('get')
                  ->with($this->equalTo('foo:bar'))
@@ -28,7 +31,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testMemcacheValueIsReturned()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['get', 'getResultCode'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('get')
                  ->will($this->returnValue('bar'));
@@ -43,7 +49,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testMemcacheGetMultiValuesAreReturnedWithCorrectKeys()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['getMulti', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['getMulti', 'getResultCode'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('getMulti')
                  ->with(['foo:foo', 'foo:bar', 'foo:baz'])
@@ -62,7 +71,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testMemcacheGetMultiValuesAreReturnedWithMissingKeys()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['getMulti', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['getMulti', 'getResultCode'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('getMulti')
                  ->with(['foo:foo', 'foo:bar', 'foo:baz']);
@@ -82,7 +94,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
     {
         Carbon::setTestNow($now = Carbon::now());
 
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['set'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['set'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('set')
                  ->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($now->timestamp + 60))
@@ -101,7 +116,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
     {
         Carbon::setTestNow($now = Carbon::now());
 
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['setMulti'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['setMulti'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('setMulti')
                  ->with(['foo' => 'fizz', 'bar' => 'buzz', 'baz' => 'norf'])
@@ -120,7 +138,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
     {
         Carbon::setTestNow($now = Carbon::now());
 
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['add'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['add'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('add')
                  ->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($now->timestamp + 60))
@@ -137,7 +158,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testIncrementMethodProperlyCallsMemcache()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['increment'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['increment'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('increment')
                  ->with($this->equalTo('foo'), $this->equalTo(5));
@@ -149,7 +173,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testDecrementMethodProperlyCallsMemcache()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['decrement'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['decrement'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('decrement')
                  ->with($this->equalTo('foo'), $this->equalTo(5));
@@ -161,7 +188,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testStoreItemForeverProperlyCallsMemcached()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['set'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['set'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('set')
                  ->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))
@@ -176,7 +206,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testForgetMethodProperlyCallsMemcache()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['delete'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['delete'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('delete')
                  ->with($this->equalTo('foo'));
@@ -188,7 +221,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testFlushesCached()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['flush'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['flush'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('flush')
                  ->willReturn(true);
@@ -217,7 +253,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testNoMcrouterConfigNeeded()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['get'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('get')
                  ->with($this->equalTo('foo:/default/shr/bar'))
@@ -230,7 +269,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testWrongSharedPrefixIsPrefixed()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['get'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('get')
                  ->with($this->equalTo('foo:/default/shr/bar'))
@@ -243,7 +285,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testSharedPrefixIsNotPrefixed()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['get'])
+                         ->getMock();
+
         $memcache->expects($this->once())
                  ->method('get')
                  ->with($this->equalTo('/default/shr/foo:bar'))
@@ -256,7 +301,10 @@ class CacheMemcachedStoreTest extends AbstractTestCase
 
     public function testAdditionalPrefixesIsNotPrefixed()
     {
-        $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['get'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)
+                         ->setMethods(['get'])
+                         ->getMock();
+
         $memcache->expects($this->exactly(4))
                  ->method('get')
                  ->withConsecutive(

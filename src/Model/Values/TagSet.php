@@ -10,7 +10,7 @@ class TagSet extends LaravelTagSet
     /**
      * Static cache for tags
      *
-     * @var array
+     * @var string[]
      */
     private static $tags = [];
 
@@ -24,8 +24,8 @@ class TagSet extends LaravelTagSet
     /**
      * Create a new TagSet instance.
      *
-     * @param \Illuminate\Contracts\Cache\Store     $store
-     * @param array                                 $names
+     * @param \Illuminate\Contracts\Cache\Store        $store
+     * @param string[]                                 $names
      * @param \Inspirum\Mcrouter\Model\Values\Mcrouter $mcrouter
      */
     public function __construct(Store $store, array $names, Mcrouter $mcrouter)
@@ -38,7 +38,7 @@ class TagSet extends LaravelTagSet
     /**
      * Get an array of tag identifiers for all of the tags in the set.
      *
-     * @return array
+     * @return string[]
      */
     protected function tagIds()
     {
@@ -98,7 +98,7 @@ class TagSet extends LaravelTagSet
     /**
      * Get cached tags from static memory
      *
-     * @return array
+     * @return string[]
      */
     public static function getCachedTags(): array
     {
