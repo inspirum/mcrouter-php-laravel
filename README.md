@@ -29,16 +29,16 @@
 composer require inspirum/mcrouter
 ```
 
-For Laravel 5.4 and below it necessary to register the service provider in `config/app.php`.
+It necessary to register the service provider in `config/app.php` right after `CacheServiceProvider`.
 
 ```php
-  'providers' => [
-    // ...
-    Inspirum\Mcrouter\Providers\McrouterServiceProvider::class,
-  ]
+'providers' => [
+  // ...
+  Illuminate\Cache\CacheServiceProvider::class,
+  Inspirum\Mcrouter\Providers\McrouterServiceProvider::class,
+  // ...
+]
 ```
-
-On newer versions Laravel will automatically register via [Package Discovery](https://laravel.com/docs/master/packages#package-discovery).
 
 
 ### Config Files

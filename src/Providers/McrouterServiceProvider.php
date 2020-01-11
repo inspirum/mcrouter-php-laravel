@@ -20,7 +20,10 @@ class McrouterServiceProvider extends LaravelServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../../config/mcrouter.php', 'mcrouter');
+        $configFile = __DIR__ . '/../../config/mcrouter.php';
+
+        $this->mergeConfigFrom($configFile, 'mcrouter');
+        $this->publishes([$configFile => config_path('mcrouter.php')], 'config');
     }
 
     /**
