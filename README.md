@@ -112,9 +112,9 @@ get __prefix__:/default/c/foo
 ### Mcrouter configuration
 
 This configuration example is for multiple Memcached servers, one of which is local, such as a typical Kubernetes cluster. 
-We only want to use the local server, if possible, to achieve the lowest latency, but to invalidate the cache key on each server.
+We only want to use the local server (on the same node as pod), if possible, to achieve the lowest latency, but to invalidate the cache key on each server.
 
-Tagged cache flush method (`cache()->tags(['bop', 'zap'])->flush()`) do not use `delete` on Memcached server but update tag cached values instead.  
+Tagged cache flush method (`cache()->tags(['bop', 'zap'])->flush()`) do not use `delete` operation on Memcached server but update tag cached values instead.  
 
 All operations with shared prefix (`/default/shr/`) and all `delete` operations are send to each nodes with [`AllFastestRoute`](https://github.com/facebook/mcrouter/wiki/List-of-Route-Handles#allfastestroute) handle, 
 rest of the operations are send only to local server(s) with [`PoolRoute`](https://github.com/facebook/mcrouter/wiki/List-of-Route-Handles#poolroute) handle.
