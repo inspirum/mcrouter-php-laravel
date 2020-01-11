@@ -6,3 +6,6 @@ parameters:
 		-
 			message: '#Cannot access offset (.+)#'
 			path: %currentWorkingDirectory%/src/Providers/McrouterServiceProvider.php
+		-
+			message: '#Function config_path not found#'
+			path: %currentWorkingDirectory%/src/Providers/McrouterServiceProvider.php
