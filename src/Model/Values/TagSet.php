@@ -47,10 +47,10 @@ class TagSet extends LaravelTagSet
 
         foreach ($this->names as $name) {
             // get tag hash from static cache or from memcache
-            $tag = static::$tags[$name] ?? $this->tagId($name);
+            $tag = self::$tags[$name] ?? $this->tagId($name);
 
             // store tag id to static cache
-            $ids[] = static::$tags[$name] = $tag;
+            $ids[] = self::$tags[$name] = $tag;
         }
 
         // return tag hashed ids
@@ -67,7 +67,7 @@ class TagSet extends LaravelTagSet
     public function resetTag($name)
     {
         // unset tag value from static cache
-        unset(static::$tags[$name]);
+        unset(self::$tags[$name]);
 
         // reset tag value in memcache
         return parent::resetTag($name);
@@ -92,7 +92,7 @@ class TagSet extends LaravelTagSet
      */
     public static function resetCachedTags(): void
     {
-        static::$tags = [];
+        self::$tags = [];
     }
 
     /**
@@ -102,6 +102,6 @@ class TagSet extends LaravelTagSet
      */
     public static function getCachedTags(): array
     {
-        return static::$tags;
+        return self::$tags;
     }
 }
