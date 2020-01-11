@@ -43,6 +43,13 @@
       "Inspirum\\Mcrouter\\Tests\\": "tests"
     }
   },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Inspirum\\Mcrouter\\Providers\\McrouterServiceProvider"
+      ]
+    }
+  },
   "scripts": {
     "test:test": [
       "@phpunit"
