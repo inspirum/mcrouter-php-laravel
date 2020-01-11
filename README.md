@@ -1,4 +1,4 @@
-# Laravel cache module with mcrouter support
+# Memcached with Mcrouter support for Laravel
 
 **Created as part of [inspishop][link-inspishop] e-commerce platform by [inspirum][link-inspirum] team.**
 
@@ -10,46 +10,306 @@
 [![Total Downloads][ico-packagist-download]][link-packagist-download]
 [![Software License][ico-license]][link-licence]
 
-- Simple description
+[Memcached](http://memcached.org/) cache store implementation for [Laravel framework](https://github.com/laravel/framework) optimized to work with [Mcrouter](https://github.com/facebook/mcrouter).
 
-
-## Usage example
-
-*All the code snippets shown here are modified for clarity, so they may not be executable.*
-
-```php
-
-```
+- Static cache for [tags](https://laravel.com/docs/master/cache#cache-tags) to reduces the number of queries to the Memcached server
+- Support for Mcrouter [prefix routing](https://github.com/facebook/mcrouter/wiki/Prefix-routing-setup)
+- Optimized to be used in Kubernetes cluster with Memcached server on each node to achieve the lowest latency
 
 
 ## System requirements
 
 * [PHP 7.1+](http://php.net/releases/7_1_0.php)
-* [ext-curl](http://php.net/memcached)
+* [ext-memcached](http://php.net/memcached)
 
 
 ## Installation
 
-```bash
-$ composer require inspirum/cache
+```shell script
+composer require inspirum/mcrouter
+```
+
+For Laravel 5.4 and below it necessary to register the service provider in `config/app.php`.
+
+```php
+  'providers' => [
+    // ...
+    Inspirum\Mcrouter\Providers\McrouterServiceProvider::class,
+  ]
+```
+
+On newer versions Laravel will automatically register via [Package Discovery](https://laravel.com/docs/master/packages#package-discovery).
+
+
+### Config Files
+
+In order to edit the default configuration you may execute:
+
+```shell script
+php artisan vendor:publish --provider="Inspirum\Mcrouter\Providers\McrouterServiceProvider"
+```
+
+After that, `config/mcrouter.php` will be created.
+
+```php
+<?php
+
+return [
+  'mcrouter' => [
+    'shared_prefix' => '/default/shr/',
+    'prefixes'      => [
+      '/default/a/',
+      '/default/b/',
+      '/default/c/',
+    ]
+  ]
+];
+```
+Or you can used environment variables:
+
+```ini
+CACHE_MCROUTER_SHARED_PREFIX='/default/shr/'
+CACHE_MCROUTER_PREFIXES='/default/a/,/default/b/,/default/c/'
 ```
 
 
-## Usage
+## Usage example
+
+Cache tags are automatically prefixed with Mcrouter shared prefix. 
+
+```ini
+CACHE_PREFIX='__prefix__'
+CACHE_MCROUTER_SHARED_PREFIX='/default/shr/'
+```
+```php
+cache()->tags(['bop', 'zap'])->get('foo');
+```
+```
+get /default/shr/__prefix__:tag:bop:key
+get /default/shr/__prefix__:tag:zap:key
+get __prefix__:foo
+```
+
+
+Package support additional prefixes which can be used on Mcrouter routing prefix.
+
+```ini
+CACHE_PREFIX='__prefix__'
+CACHE_MCROUTER_PREFIXES='/default/a/,/default/b/'
+```
+```php
+cache()->get('/default/a/foo');
+cache()->get('/default/b/foo');
+cache()->get('/default/c/foo');
+```
+```
+get /default/a/__prefix__:foo
+get /default/b/__prefix__:foo
+get __prefix__:/default/c/foo
+```
+
+
+### Mcrouter configuration
+
+This configuration example is for multiple Memcached servers, one of which is local, such as a typical Kubernetes cluster. 
+We only want to use the local server, if possible, to achieve the lowest latency, but to invalidate the cache key on each server.
+
+Tagged cache flush method (`cache()->tags(['bop', 'zap'])->flush()`) do not use `delete` on Memcached server but update tag cached values instead.  
+
+All operations with shared prefix (`/default/shr/`) and all `delete` operations are send to each nodes with [`AllFastestRoute`](https://github.com/facebook/mcrouter/wiki/List-of-Route-Handles#allfastestroute) handle, 
+rest of the operations are send only to local server(s) with [`PoolRoute`](https://github.com/facebook/mcrouter/wiki/List-of-Route-Handles#poolroute) handle.
+
+> Instead of `AllFastestRoute` you can use `AllSyncRoute` or `AllAsyncRoute` handle.
+
+```json
+{
+  "pools": {
+    "local": {
+      "servers": [
+        "127.0.0.1:11211"
+      ]
+    },
+    "nodes": {
+      "servers": [
+        "10.80.10.1:11211",
+        "10.80.10.2:11211",
+        "10.80.10.3:11211"
+      ]
+    }
+  },
+  "routes": [
+    {
+      "aliases": [
+        "/default/local/"
+      ],
+      "route": {
+        "type": "OperationSelectorRoute",
+        "default_policy": "PoolRoute|local",
+        "operation_policies": {
+          "delete": "AllFastestRoute|Pool|nodes"
+        }
+      }
+    },
+    {
+      "aliases": [
+        "/default/shr/"
+      ],
+      "route": "AllFastestRoute|Pool|nodes"
+    }
+  ]
+}
+```
+
+
+### Kubernetes example
+
+Example of Memcached with Mcrouter used on Kuberentes cluster with three nodes (`10.80.10.1`, `10.80.10.2`, `10.80.10.3`).
+
+Using `DaemonSet` resource ensures that Memcached and Mcrouter will be available on each server (on ports `11211` and `11212`).
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: memcached
+spec:
+  template:
+    spec:
+      containers:
+        - name: memcached
+          image: memcached:1.5-alpine
+          command: ["memcached"]
+          ports:
+            - name: memcache
+              containerPort: 11211
+              hostPort: 11211
+```
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mcrouter
+data:
+  config.json: |-
+    {
+      "pools": {
+        "local": {
+          "servers": [
+            "$HOST_IP:11211"
+          ]
+        },
+        "nodes": {
+          "servers": [
+            "10.80.10.1:11211",
+            "10.80.10.2:11211",
+            "10.80.10.3:11211"
+          ]
+        }
+      },
+      "routes": [
+        {
+          "aliases": [
+            "/default/local/"
+          ],
+          "route": {
+            "type": "OperationSelectorRoute",
+            "default_policy": "PoolRoute|local",
+            "operation_policies": {
+              "delete": "AllFastestRoute|Pool|nodes"
+            }
+          }
+        },
+        {
+          "aliases": [
+            "/default/shr/"
+          ],
+          "route": "AllFastestRoute|Pool|nodes"
+        }
+      ]
+    }
+```
+```yaml
+kind: DaemonSet
+metadata:
+  name: mcrouter
+spec:
+  template:
+    spec:
+      volumes:
+        - name: config
+          emptyDir: {}
+        - name: config-stub
+          configMap:
+            name: mcrouter
+      initContainers:
+        - name: config-init
+          image: alpine:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', 'cp /tmp/mcrouter/config.json /etc/mcrouter/config.json && sed -i "s|\$HOST_IP|${HOST_IP}|g" /etc/mcrouter/config.json']
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          volumeMounts:
+            - name: config-stub
+              mountPath: /tmp/mcrouter
+            - name: config
+              mountPath: /etc/mcrouter
+      containers:
+        - name: mcrouter
+          image: mcrouter/mcrouter:latest
+          imagePullPolicy: IfNotPresent
+          command: ["mcrouter"]
+          args:
+            - --port=11212
+            - --config-file=/etc/mcrouter/config.json
+            - --route-prefix=/default/local/
+            - --send-invalid-route-to-default
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mcrouter
+          ports:
+            - name: mcrouter
+              containerPort: 11212
+              hostPort: 11212
+```
+
+
+You can use `status.hostIP` to inject current node IP to pod to use to connect to local Memcached/Mcrouter server.
+
+```yaml
+kind: Deployment
+metadata:
+  name: example
+spec:
+  template:
+    spec:
+      containers:
+        - name: example
+          image: alpine:latest
+          env:
+            - name: MCROUTER_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: MCROUTER_PORT
+              value: "11212"
+```
 
 
 ## Testing
 
 To run unit tests, run:
 
-```bash
-$ composer test:test
+```shell script
+composer test:test
 ```
 
 To show coverage, run:
 
-```bash
-$ composer test:coverage
+```shell script
+composer test:coverage
 ```
 
 
