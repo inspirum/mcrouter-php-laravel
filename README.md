@@ -34,7 +34,7 @@ For Laravel 5.4 and below it necessary to register the service provider in `conf
 ```php
 'providers' => [
   // ...
-  Illuminate\Cache\CacheServiceProvider::class,
+  Inspirum\Mcrouter\Providers\McrouterServiceProvider::class,
 ]
 ```
 
