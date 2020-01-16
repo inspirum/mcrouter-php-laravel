@@ -29,6 +29,8 @@
 composer require inspirum/mcrouter
 ```
 
+This package supports Laravel 5.3 or later (including Laravel 6).
+
 For Laravel 5.4 and below it necessary to register the service provider in `config/app.php`.
 
 ```php
