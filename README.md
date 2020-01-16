@@ -55,14 +55,12 @@ After that, `config/mcrouter.php` will be created.
 <?php
 
 return [
-  'mcrouter' => [
-    'shared_prefix' => '/default/shr/',
-    'prefixes'      => [
-      '/default/a/',
-      '/default/b/',
-      '/default/c/',
-    ]
-  ]
+  'shared_prefix' => '/default/shr/',
+  'prefixes'      => [
+    '/default/a/',
+    '/default/b/',
+    '/default/c/',
+  ],
 ];
 ```
 Or you can used environment variables:
