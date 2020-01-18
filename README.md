@@ -109,6 +109,23 @@ get __prefix__:/default/c/foo
 ```
 
 
+### Cache tags static cache
+
+```php
+cache()->tags(['bop', 'zap'])->get('bar1');
+cache()->tags(['bop'])->get('bar2');
+cache()->tags(['bop', 'zap', 'foo'])->get('bar3');
+```
+```
+get tag:bop:key
+get tag:zap:key
+get bar1
+get bar2
+get tag:foo:key
+get bar3
+```
+
+
 ### Mcrouter configuration
 
 This configuration example is for multiple Memcached servers, one of which is local, such as a typical Kubernetes cluster. 

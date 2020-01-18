@@ -34,7 +34,7 @@ class MemcachedStore extends LaravelMemcachedStore
     /**
      * Begin executing a new tags operation.
      *
-     * @param string|string[] $names
+     * @param string|array<string> $names
      *
      * @return \Illuminate\Cache\TaggedCache
      */
@@ -66,9 +66,9 @@ class MemcachedStore extends LaravelMemcachedStore
      *
      * Items not found in the cache will have a null value.
      *
-     * @param string[] $keys
+     * @param array<string> $keys
      *
-     * @return array
+     * @return array<string,mixed>
      */
     public function many(array $keys)
     {
@@ -76,14 +76,14 @@ class MemcachedStore extends LaravelMemcachedStore
             return $this->getPrefixedKey($key);
         }, $keys);
 
-        /** @var array $values */
+        /** @var array<mixed> $values */
         $values = $this->memcached->getMulti($prefixedKeys, Memcached::GET_PRESERVE_ORDER);
 
         if ($this->memcached->getResultCode() !== 0) {
             return array_fill_keys($keys, null);
         }
 
-        /** @var array $values */
+        /** @var array<mixed> $values */
         $values = array_combine($keys, $values);
 
         return $values;
@@ -106,8 +106,8 @@ class MemcachedStore extends LaravelMemcachedStore
     /**
      * Store multiple items in the cache for a given number of minutes.
      *
-     * @param array $values
-     * @param int   $seconds
+     * @param array<string,mixed> $values
+     * @param int                 $seconds
      *
      * @return bool
      */

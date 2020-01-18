@@ -1,7 +1,6 @@
 includes:
 	- vendor/phpstan/phpstan-mockery/extension.neon
 parameters:
-	checkMissingIterableValueType: false
 	ignoreErrors:
 		-
 			message: '#Cannot access offset (.+)#'
