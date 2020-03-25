@@ -6,17 +6,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 
-## [1.1.0] - 2020-03-25
+## [Unreleased](https://github.com/inspirum/mcrouter-php-laravel/compare/v1.1.0...master)
+
+
+## [v1.1.0 (2020-03-25)](https://github.com/inspirum/mcrouter-php-laravel/compare/v1.0.1...v1.1.0)
 ### Added
 - Added support for Laravel ^7.0
 
 
-## [1.0.1] - 2020-01-16
+## [v1.0.1 (2020-01-16)](https://github.com/inspirum/mcrouter-php-laravel/compare/v1.0.0...v1.0.1)
 ### Changed
 - Changed support for Laravel ^5.3|^6.0
 
 
-## [1.0.0] - 2020-01-11
+## v1.0.0 (2020-01-11)
 ### Added
 - Add `MemcachedStore.php` for `memcached` cache driver
 - Add `MemcachedSessionHandler.php` for `memcached` session driver
